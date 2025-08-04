@@ -1,8 +1,8 @@
 const { blazeAPI } = require('./blaze-roulette-api.cjs');
 
 /**
- * Sistema de estratégia de apostas automatizadas - VERSÃO CORRIGIDA
- * Agora aposta na cor MAIS FREQUENTE (mais provável) ao invés da menos frequente
+ * Sistema de estratégia de apostas automatizadas - VERSÃO CORRIGIDA COM MARTINGALE
+ * Implementa martingale progressivo e cálculo preciso de lucros
  */
 class BettingStrategy {
     constructor(database) {
@@ -15,9 +15,10 @@ class BettingStrategy {
      * Analisa os dados e decide se deve apostar e em qual cor
      * @param {Array} blazeResults - Últimos resultados da Blaze
      * @param {Object} userConfig - Configurações do usuário
+     * @param {Object} sessionData - Dados da sessão atual
      * @returns {Promise<Object>} Decisão de aposta
      */
-    async analyzeAndDecide(blazeResults, userConfig) {
+    async analyzeAndDecide(blazeResults, userConfig, sessionData = {}) {
         try {
             console.log('🧠 Iniciando análise para decisão de aposta...');
             
@@ -27,14 +28,15 @@ class BettingStrategy {
             // Analisar padrões locais
             const localAnalysis = this.analyzeLocalPatterns(blazeResults);
             
-            // Combinar análises - LÓGICA CORRIGIDA
-            const decision = this.makeDecision(apiAnalysis, localAnalysis, userConfig);
+            // Combinar análises
+            const decision = this.makeDecision(apiAnalysis, localAnalysis, userConfig, sessionData);
             
             console.log('📊 Análise completa:', {
                 shouldBet: decision.shouldBet,
                 color: decision.color,
                 confidence: decision.confidence,
-                reason: decision.reason
+                reason: decision.reason,
+                amount: decision.amount
             });
             
             return decision;
@@ -45,7 +47,8 @@ class BettingStrategy {
                 shouldBet: false,
                 color: null,
                 confidence: 0,
-                reason: 'Erro na análise: ' + error.message
+                reason: 'Erro na análise: ' + error.message,
+                amount: userConfig.bet_amount || 1.0
             };
         }
     }
@@ -201,11 +204,9 @@ class BettingStrategy {
     }
 
     /**
-     * ===================================================================
      * MÉTODO PRINCIPAL CORRIGIDO - APOSTA NA COR MAIS FREQUENTE
-     * ===================================================================
      */
-    makeDecision(apiAnalysis, localAnalysis, userConfig) {
+    makeDecision(apiAnalysis, localAnalysis, userConfig, sessionData = {}) {
         const decision = {
             shouldBet: false,
             color: null,
@@ -222,53 +223,41 @@ class BettingStrategy {
 
         console.log('🔍 === INICIANDO ANÁLISE CORRIGIDA ===');
 
-        // ✅ ALGORITMO CORRIGIDO - Apostar na cor mais provável
+        // Algoritmo de análise
         const scores = { red: 0, black: 0, white: 0 };
         
-        // =====================================
-        // 1. ANÁLISE DA API (peso 50%) - CORRIGIDA
-        // =====================================
+        // 1. ANÁLISE DA API (peso 50%)
         if (apiAnalysis.colorsInfo) {
             console.log('📊 Dados da API:', apiAnalysis.colorsInfo);
             
             apiAnalysis.colorsInfo.forEach(colorInfo => {
                 const colorName = this.mapColorName(colorInfo.color);
                 if (colorName) {
-                    // ✅ CORREÇÃO: Favorecer cores com MAIOR frequência (mais prováveis)
-                    // Quanto maior a porcentagem, maior a pontuação
                     const points = colorInfo.percent * 0.5;
                     scores[colorName] += points;
-                    
                     console.log(`🎯 ${colorName.toUpperCase()}: ${colorInfo.percent}% -> +${points.toFixed(1)} pontos`);
                 }
             });
         }
 
-        // =====================================
-        // 2. MOMENTUM POSITIVO (peso 25%) - CORRIGIDA  
-        // =====================================
+        // 2. MOMENTUM POSITIVO (peso 25%)
         const momentum = localAnalysis.trends.momentum;
         const totalMomentum = Object.values(momentum).reduce((a, b) => a + b, 0);
         
         if (totalMomentum > 0) {
             Object.keys(momentum).forEach(color => {
-                // ✅ CORREÇÃO: Favorecer cores com MAIOR momentum (estão "quentes")
                 const momentumPercent = (momentum[color] / totalMomentum) * 100;
                 const points = momentumPercent * 0.25;
                 scores[color] += points;
-                
                 console.log(`🔥 Momentum ${color.toUpperCase()}: ${momentumPercent.toFixed(1)}% -> +${points.toFixed(1)} pontos`);
             });
         }
 
-        // =====================================
-        // 3. PADRÕES ANTI-STREAK (peso 15%) - MANTIDA
-        // =====================================
+        // 3. PADRÕES ANTI-STREAK (peso 15%)
         localAnalysis.patterns.forEach(pattern => {
             if (pattern.type === 'long_streak' && pattern.count >= 4) {
-                // Esta lógica está correta: após streak longo, apostar na cor oposta
                 const oppositeColors = this.getOppositeColors(pattern.color);
-                const points = pattern.count * 0.075; // 15% / 2 cores opostas
+                const points = pattern.count * 0.075;
                 
                 oppositeColors.forEach(color => {
                     scores[color] += points;
@@ -278,31 +267,22 @@ class BettingStrategy {
             }
         });
 
-        // =====================================
-        // 4. TENDÊNCIA RECENTE (peso 10%) - CORRIGIDA
-        // =====================================
+        // 4. TENDÊNCIA RECENTE (peso 10%)
         const recent5 = localAnalysis.trends.recent5;
         Object.keys(recent5).forEach(color => {
-            // ✅ CORREÇÃO: Favorecer cores que apareceram MAIS nos últimos 5 (tendência quente)
             const points = recent5[color].percent * 0.1;
             scores[color] += points;
-            
             console.log(`📈 Tendência ${color.toUpperCase()}: ${recent5[color].percent.toFixed(1)}% recente -> +${points.toFixed(1)} pontos`);
         });
 
-        // =====================================
-        // 5. FILTRO DE REALIDADE - NOVO
-        // =====================================
-        // Penalizar branco drasticamente (só 7% de chance real na Blaze)
+        // 5. FILTRO DE REALIDADE
         if (scores.white > 0) {
             const originalWhite = scores.white;
-            scores.white *= 0.2; // Reduz pontuação do branco em 80%
+            scores.white *= 0.2;
             console.log(`⚪ PENALIDADE BRANCO: ${originalWhite.toFixed(1)} -> ${scores.white.toFixed(1)} pontos (-80%)`);
         }
 
-        // =====================================
         // 6. DECISÃO FINAL
-        // =====================================
         console.log('🏆 PONTUAÇÃO FINAL:', {
             '🔴 VERMELHO': scores.red.toFixed(2),
             '⚫ PRETO': scores.black.toFixed(2),
@@ -315,16 +295,14 @@ class BettingStrategy {
         );
         
         const bestScore = scores[bestColor];
-        const maxPossibleScore = 90; // 50% + 25% + 15% + 10% (ajustado)
+        const maxPossibleScore = 90;
         const confidence = Math.min(bestScore / maxPossibleScore, 1);
 
-        // =====================================
-        // 7. CRITÉRIOS DE CONFIANÇA - AJUSTADOS
-        // =====================================
+        // 7. CRITÉRIOS DE CONFIANÇA
         const minConfidenceByColor = {
-            red: 0.30,      // 30% confiança mínima para vermelho
-            black: 0.30,    // 30% confiança mínima para preto  
-            white: 0.65     // 65% confiança mínima para branco (muito mais rigoroso)
+            red: 0.30,
+            black: 0.30,
+            white: 0.65
         };
 
         const requiredConfidence = minConfidenceByColor[bestColor];
@@ -335,9 +313,19 @@ class BettingStrategy {
             decision.confidence = confidence;
             decision.reason = `✅ ${bestColor.toUpperCase()} selecionado com ${(confidence * 100).toFixed(1)}% de confiança (${bestScore.toFixed(1)} pontos)`;
             
+            // CALCULAR VALOR DA APOSTA COM MARTINGALE
+            decision.amount = this.calculateBetAmountWithMartingale(
+                userConfig.bet_amount,
+                confidence,
+                sessionData.consecutiveLosses || 0,
+                bestColor,
+                sessionData.currentBalance || 100
+            );
+            
             console.log(`🎯 ✅ DECISÃO: APOSTAR EM ${decision.color.toUpperCase()}!`);
             console.log(`   Confiança: ${(confidence * 100).toFixed(1)}% (precisa ${requiredConfidence * 100}%)`);
             console.log(`   Pontuação: ${bestScore.toFixed(1)} pontos`);
+            console.log(`   Valor da aposta: R$ ${decision.amount.toFixed(2)}`);
         } else {
             decision.reason = `❌ Confiança insuficiente: ${bestColor.toUpperCase()} com ${(confidence * 100).toFixed(1)}% (precisa ${(requiredConfidence * 100).toFixed(0)}%) ou pontuação baixa (${bestScore.toFixed(1)})`;
             console.log(`⏸️ ❌ SEM APOSTA: ${decision.reason}`);
@@ -348,21 +336,74 @@ class BettingStrategy {
     }
 
     /**
-     * Mapeia nome da cor da API para nome padrão - MELHORADO
+     * NOVO MÉTODO: Calcula valor da aposta com Martingale progressivo
+     */
+    calculateBetAmountWithMartingale(baseAmount, confidence, consecutiveLosses = 0, color = 'red', currentBalance = 100) {
+        let amount = baseAmount;
+        
+        console.log(`💰 === CÁLCULO MARTINGALE ===`);
+        console.log(`   Valor base: R$ ${baseAmount}`);
+        console.log(`   Perdas consecutivas: ${consecutiveLosses}`);
+        console.log(`   Saldo atual: R$ ${currentBalance.toFixed(2)}`);
+        
+        // 1. MARTINGALE PROGRESSIVO
+        if (consecutiveLosses > 0) {
+            // Multiplicadores progressivos mais agressivos
+            const multipliers = [1, 2.2, 4.8, 10.5, 23.0, 50.0];
+            const multiplier = multipliers[Math.min(consecutiveLosses, multipliers.length - 1)];
+            amount = baseAmount * multiplier;
+            console.log(`   Multiplicador Martingale: x${multiplier} = R$ ${amount.toFixed(2)}`);
+        }
+        
+        // 2. AJUSTE POR CONFIANÇA
+        const confidenceMultiplier = 0.8 + (confidence * 0.4); // 0.8x a 1.2x
+        amount = amount * confidenceMultiplier;
+        console.log(`   Ajuste confiança (${(confidence * 100).toFixed(1)}%): x${confidenceMultiplier.toFixed(2)} = R$ ${amount.toFixed(2)}`);
+        
+        // 3. AJUSTE POR COR
+        const colorMultipliers = {
+            'vermelho': 1.0,
+            'preto': 1.0,
+            'branco': 0.3  // Muito menor para branco
+        };
+        
+        const colorMultiplier = colorMultipliers[color] || 1.0;
+        amount = amount * colorMultiplier;
+        
+        if (colorMultiplier !== 1.0) {
+            console.log(`   Ajuste cor (${color}): x${colorMultiplier} = R$ ${amount.toFixed(2)}`);
+        }
+        
+        // 4. LIMITES DE SEGURANÇA
+        const maxBetPercent = 0.15; // Máximo 15% do saldo
+        const maxAllowedBet = currentBalance * maxBetPercent;
+        
+        if (amount > maxAllowedBet) {
+            console.log(`   ⚠️ LIMITE DE SEGURANÇA: R$ ${amount.toFixed(2)} -> R$ ${maxAllowedBet.toFixed(2)} (15% do saldo)`);
+            amount = maxAllowedBet;
+        }
+        
+        // Mínimo e arredondamento
+        amount = Math.max(0.01, amount);
+        const finalAmount = Math.round(amount * 100) / 100;
+        
+        console.log(`   💵 VALOR FINAL: R$ ${finalAmount.toFixed(2)}`);
+        console.log(`💰 === FIM CÁLCULO ===\n`);
+        
+        return finalAmount;
+    }
+
+    /**
+     * Mapeia nome da cor da API para nome padrão
      */
     mapColorName(apiColor) {
         const mapping = {
-            // Formato numérico da API Blaze
-            0: 'white',    // Branco (número 0)
-            1: 'red',      // Vermelho (números 1-7)  
-            2: 'black',    // Preto (números 8-14)
-            
-            // Formato string
+            0: 'white',
+            1: 'red',
+            2: 'black',
             'white': 'white',
             'red': 'red', 
             'black': 'black',
-            
-            // Possíveis variações em português
             'branco': 'white',
             'vermelho': 'red',
             'preto': 'black'
@@ -399,55 +440,59 @@ class BettingStrategy {
     }
 
     /**
-     * Calcula o valor da aposta baseado na estratégia - MELHORADO
+     * NOVO MÉTODO: Calcula lucro/prejuízo de uma aposta
      */
-    calculateBetAmount(baseAmount, confidence, consecutiveLosses = 0, color = 'red') {
-        let amount = baseAmount;
+    calculateBetProfit(betAmount, betColor, resultColor, resultNumber) {
+        console.log(`💰 === CÁLCULO DE LUCRO ===`);
+        console.log(`   Aposta: R$ ${betAmount.toFixed(2)} em ${betColor}`);
+        console.log(`   Resultado: ${resultColor} (${resultNumber})`);
         
-        // =====================================
-        // 1. MARTINGALE MODIFICADO (mais conservador)
-        // =====================================
-        if (consecutiveLosses > 0) {
-            // Máximo 3x o valor base (mais conservador que antes)
-            const multiplier = Math.min(Math.pow(1.5, consecutiveLosses), 3);
-            amount = baseAmount * multiplier;
-            console.log(`💰 Ajuste por perdas (${consecutiveLosses}): ${baseAmount} -> ${amount.toFixed(2)} (x${multiplier.toFixed(1)})`);
+        // Normalizar cores para comparação
+        const normalizedBetColor = this.normalizeBetColor(betColor);
+        const normalizedResultColor = this.normalizeBetColor(resultColor);
+        
+        let profit = 0;
+        let won = false;
+        
+        if (normalizedBetColor === normalizedResultColor) {
+            won = true;
+            
+            // Multiplicadores da Blaze
+            if (normalizedResultColor === 'white') {
+                profit = betAmount * 14; // 14x para branco
+            } else {
+                profit = betAmount * 2; // 2x para vermelho/preto
+            }
+            
+            // Subtrair o valor apostado para obter lucro líquido
+            profit = profit - betAmount;
+            
+            console.log(`   ✅ GANHOU! Multiplicador: ${normalizedResultColor === 'white' ? '14x' : '2x'}`);
+        } else {
+            won = false;
+            profit = -betAmount; // Perde o valor apostado
+            console.log(`   ❌ PERDEU! Prejuízo: R$ ${Math.abs(profit).toFixed(2)}`);
         }
         
-        // =====================================
-        // 2. AJUSTE POR CONFIANÇA
-        // =====================================
-        // Quanto maior a confiança, maior a aposta (dentro do limite)
-        const confidenceMultiplier = 0.7 + (confidence * 0.6); // 0.7x a 1.3x
-        amount = amount * confidenceMultiplier;
-        console.log(`🎯 Ajuste por confiança (${(confidence * 100).toFixed(1)}%): x${confidenceMultiplier.toFixed(2)} = ${amount.toFixed(2)}`);
+        console.log(`   💵 LUCRO LÍQUIDO: R$ ${profit.toFixed(2)}`);
+        console.log(`💰 === FIM CÁLCULO ===\n`);
         
-        // =====================================
-        // 3. AJUSTE POR COR (NOVO)
-        // =====================================
-        const colorMultipliers = {
-            'vermelho': 1.0,    // Aposta normal para vermelho
-            'preto': 1.0,       // Aposta normal para preto
-            'branco': 0.4       // Aposta muito menor para branco (mais arriscado)
+        return {
+            won,
+            profit,
+            multiplier: won ? (normalizedResultColor === 'white' ? 14 : 2) : 0
         };
-        
-        const colorMultiplier = colorMultipliers[color] || 1.0;
-        amount = amount * colorMultiplier;
-        
-        if (colorMultiplier !== 1.0) {
-            console.log(`🎨 Ajuste por cor (${color}): x${colorMultiplier} = ${amount.toFixed(2)}`);
-        }
-        
-        // =====================================
-        // 4. LIMITES E ARREDONDAMENTO
-        // =====================================
-        amount = Math.max(0.01, amount); // Mínimo R$ 0,01
-        amount = Math.min(amount, baseAmount * 4); // Máximo 4x o valor base
-        
-        const finalAmount = Math.round(amount * 100) / 100;
-        console.log(`💵 Valor final da aposta: R$ ${finalAmount}`);
-        
-        return finalAmount;
+    }
+
+    /**
+     * Normaliza cor para comparação
+     */
+    normalizeBetColor(color) {
+        const normalized = color.toLowerCase();
+        if (normalized.includes('vermelho') || normalized.includes('red')) return 'red';
+        if (normalized.includes('preto') || normalized.includes('black')) return 'black';
+        if (normalized.includes('branco') || normalized.includes('white')) return 'white';
+        return normalized;
     }
 }
 

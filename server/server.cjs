@@ -50,6 +50,9 @@ blazeMonitor.on('disconnected', (data) => {
 blazeMonitor.on('new_result', (result) => {
     console.log('🎯 Novo resultado da Blaze:', result);
     io.emit('blaze-new-result', result);
+    
+    // Processar resultado para apostas automáticas
+    autoBettingManager.processBlazeResult(result);
 });
 
 blazeMonitor.on('state_change', (state) => {

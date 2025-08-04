@@ -401,25 +401,25 @@ const UserDashboard: React.FC = () => {
     <div className="space-y-6">
       {/* Alertas */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-4 slide-up">
           <div className="flex items-center">
             <XCircle className="w-5 h-5 text-red-500 mr-2" />
-            <p className="text-red-700">{error}</p>
+            <p className="text-red-100">{error}</p>
           </div>
         </div>
       )}
 
       {success && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-500/20 border border-green-500/50 rounded-lg p-4 slide-up">
           <div className="flex items-center">
             <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-            <p className="text-green-700">{success}</p>
+            <p className="text-green-100">{success}</p>
           </div>
         </div>
       )}
 
       {/* Status do Monitor da Blaze */}
-      <div className="bg-white rounded-lg shadow p-4">
+      <div className="card-dark p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2">
@@ -428,7 +428,7 @@ const UserDashboard: React.FC = () => {
               ) : (
                 <WifiOff className="w-5 h-5 text-red-500" />
               )}
-              <span className="font-medium">Monitor da Blaze</span>
+              <span className="font-medium text-slate-200">Monitor da Blaze</span>
             </div>
             <span className={`px-2 py-1 rounded-full text-xs font-medium ${
               blazeConnected ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
@@ -438,7 +438,7 @@ const UserDashboard: React.FC = () => {
           </div>
           
           <div className="flex items-center space-x-4">
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-slate-300">
               Status: <span className="font-medium">{getBlazeStatusText(blazeState.status)}</span>
             </div>
             {blazeState.roll !== null && (
@@ -453,42 +453,42 @@ const UserDashboard: React.FC = () => {
 
       {/* Cards de estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="card-dark p-6">
           <div className="flex items-center">
             <div className="bg-green-100 p-3 rounded-lg">
               <Wallet className="w-6 h-6 text-green-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Saldo</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm font-medium text-slate-400">Saldo</p>
+              <p className="text-2xl font-bold text-slate-100">
                 R$ {balance ? balance.balance.toFixed(2) : '0.00'}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="card-dark p-6">
           <div className="flex items-center">
             <div className="bg-blue-100 p-3 rounded-lg">
               <TrendingUp className="w-6 h-6 text-blue-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Lucro Total</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm font-medium text-slate-400">Lucro Total</p>
+              <p className="text-2xl font-bold text-slate-100">
                 R$ {stats ? stats.total_profit.toFixed(2) : '0.00'}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="card-dark p-6">
           <div className="flex items-center">
             <div className="bg-purple-100 p-3 rounded-lg">
               <Target className="w-6 h-6 text-purple-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Taxa de Vitória</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm font-medium text-slate-400">Taxa de Vitória</p>
+              <p className="text-2xl font-bold text-slate-100">
                 {stats && stats.total_bets > 0 
                   ? ((stats.wins / stats.total_bets) * 100).toFixed(1) + '%'
                   : '0%'
@@ -498,14 +498,14 @@ const UserDashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="card-dark p-6">
           <div className="flex items-center">
             <div className="bg-orange-100 p-3 rounded-lg">
               <History className="w-6 h-6 text-orange-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total de Apostas</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm font-medium text-slate-400">Total de Apostas</p>
+              <p className="text-2xl font-bold text-slate-100">
                 {stats ? stats.total_bets : 0}
               </p>
             </div>
@@ -514,13 +514,13 @@ const UserDashboard: React.FC = () => {
       </div>
 
       {/* Resultados da Blaze em Tempo Real */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b border-gray-200">
+      <div className="card-dark">
+        <div className="p-6 border-b border-slate-700">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900">Resultados da Blaze</h3>
+            <h3 className="text-lg font-medium text-slate-100">Resultados da Blaze</h3>
             <div className="flex items-center space-x-2">
-              <Activity className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-600">Tempo Real</span>
+              <Activity className="w-4 h-4 text-slate-400" />
+              <span className="text-sm text-slate-300">Tempo Real</span>
             </div>
           </div>
         </div>
@@ -530,20 +530,20 @@ const UserDashboard: React.FC = () => {
             {blazeResults.slice(0, 20).map((result, index) => (
               <div
                 key={result.id}
-                className="flex flex-col items-center p-2 rounded-lg border hover:shadow-md transition-shadow"
+                className="flex flex-col items-center p-2 rounded-lg border border-slate-600 hover:border-slate-500 transition-all hover:shadow-lg"
                 title={`${getBlazeColorName(result.color)} - ${result.roll} - ${new Date(result.created_at).toLocaleString('pt-BR')}`}
               >
                 <div className={`w-8 h-8 rounded-full mb-1 ${getBlazeColorClass(result.color)}`} />
                 <span className="text-xs font-bold">{result.roll}</span>
-                <span className="text-xs text-gray-500">#{index + 1}</span>
+                <span className="text-xs text-slate-400">#{index + 1}</span>
               </div>
             ))}
           </div>
           
           {blazeResults.length === 0 && (
             <div className="text-center py-8">
-              <Activity className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">Aguardando resultados da Blaze...</p>
+              <Activity className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+              <p className="text-slate-400">Aguardando resultados da Blaze...</p>
             </div>
           )}
         </div>
@@ -552,13 +552,13 @@ const UserDashboard: React.FC = () => {
       {/* Configuração e Controles */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Configuração do Bot */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="p-6 border-b border-gray-200">
+        <div className="card-dark">
+          <div className="p-6 border-b border-slate-700">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium text-gray-900">Configuração do Bot</h3>
+              <h3 className="text-lg font-medium text-slate-100">Configuração do Bot</h3>
               <div className="flex items-center space-x-2">
-                <div className={`w-2 h-2 rounded-full ${isBotActive ? 'bg-green-500' : 'bg-red-500'}`} />
-                <span className="text-sm text-gray-600">
+                <div className={`w-2 h-2 rounded-full ${isBotActive ? 'status-online' : 'status-offline'}`} />
+                <span className="text-sm text-slate-300">
                   {isBotActive ? 'Ativo' : 'Inativo'}
                 </span>
               </div>
@@ -569,26 +569,26 @@ const UserDashboard: React.FC = () => {
             {!isBotActive && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
                     Access Token
                   </label>
                   <textarea
                     value={tokens.accessToken}
                     onChange={(e) => setTokens({ ...tokens, accessToken: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-md text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     rows={3}
                     placeholder="Cole seu access token aqui..."
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
                     Refresh Token
                   </label>
                   <textarea
                     value={tokens.refreshToken}
                     onChange={(e) => setTokens({ ...tokens, refreshToken: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-md text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     rows={3}
                     placeholder="Cole seu refresh token aqui..."
                   />
@@ -597,10 +597,10 @@ const UserDashboard: React.FC = () => {
                 <button
                   onClick={initializeBot}
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-2 px-4 rounded-md hover:from-orange-600 hover:to-red-600 transition-all duration-200 disabled:opacity-50 flex items-center justify-center"
+                  className="w-full btn-primary disabled:opacity-50 flex items-center justify-center"
                 >
                   {isLoading ? (
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="w-5 h-5 spinner" />
                   ) : (
                     <>
                       <Play className="w-4 h-4 mr-2" />
@@ -614,8 +614,8 @@ const UserDashboard: React.FC = () => {
             {isBotActive && (
               <div className="text-center py-8">
                 <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                <h4 className="text-lg font-medium text-gray-900 mb-2">Bot Ativo</h4>
-                <p className="text-gray-600">
+                <h4 className="text-lg font-medium text-slate-100 mb-2">Bot Ativo</h4>
+                <p className="text-slate-300">
                   Seu bot está funcionando e os tokens são atualizados automaticamente.
                 </p>
               </div>
@@ -624,15 +624,15 @@ const UserDashboard: React.FC = () => {
         </div>
 
         {/* Fazer Aposta Manual */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="p-6 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">Aposta Manual</h3>
+        <div className="card-dark">
+          <div className="p-6 border-b border-slate-700">
+            <h3 className="text-lg font-medium text-slate-100">Aposta Manual</h3>
           </div>
           
           <div className="p-6">
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
                   Cor
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -642,19 +642,19 @@ const UserDashboard: React.FC = () => {
                       onClick={() => setBetForm({ ...betForm, color })}
                       className={`p-3 rounded-lg border-2 transition-all ${
                         betForm.color === color 
-                          ? 'border-orange-500 ring-2 ring-orange-200' 
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'neon-border' 
+                          : 'border-slate-600 hover:border-slate-500'
                       }`}
                     >
                       <div className={`w-6 h-6 rounded-full mx-auto mb-1 ${getColorClass(color)}`} />
-                      <span className="text-xs font-medium capitalize">{color}</span>
+                      <span className="text-xs font-medium capitalize text-slate-200">{color}</span>
                     </button>
                   ))}
                 </div>
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
                   Valor (R$)
                 </label>
                 <input
@@ -663,17 +663,17 @@ const UserDashboard: React.FC = () => {
                   min="0.01"
                   value={betForm.amount}
                   onChange={(e) => setBetForm({ ...betForm, amount: parseFloat(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-md text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 />
               </div>
               
               <button
                 onClick={placeBet}
                 disabled={isLoading || !isBotActive}
-                className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-2 px-4 rounded-md hover:from-green-600 hover:to-green-700 transition-all duration-200 disabled:opacity-50 flex items-center justify-center"
+                className="w-full gradient-success text-white py-2 px-4 rounded-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 flex items-center justify-center"
               >
                 {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-5 h-5 spinner" />
                 ) : (
                   <>
                     <DollarSign className="w-4 h-4 mr-2" />
@@ -687,16 +687,16 @@ const UserDashboard: React.FC = () => {
       </div>
 
       {/* Apostas Automáticas */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b border-gray-200">
+      <div className="card-dark">
+        <div className="p-6 border-b border-slate-700">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-medium text-gray-900">Apostas Automáticas</h3>
-              <p className="text-sm text-gray-600">Sistema inteligente com análise de padrões</p>
+              <h3 className="text-lg font-medium text-slate-100">Apostas Automáticas</h3>
+              <p className="text-sm text-slate-400">Sistema inteligente com análise de padrões</p>
             </div>
             <div className="flex items-center space-x-2">
-              <div className={`w-2 h-2 rounded-full ${isAutoBettingActive ? 'bg-green-500' : 'bg-red-500'}`} />
-              <span className="text-sm text-gray-600">
+              <div className={`w-2 h-2 rounded-full ${isAutoBettingActive ? 'status-online' : 'status-offline'}`} />
+              <span className="text-sm text-slate-300">
                 {isAutoBettingActive ? 'Ativo' : 'Inativo'}
               </span>
             </div>
@@ -707,10 +707,10 @@ const UserDashboard: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Configurações */}
             <div className="space-y-4">
-              <h4 className="font-medium text-gray-900">Configurações</h4>
+              <h4 className="font-medium text-slate-100">Configurações</h4>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
                   Valor por Aposta (R$)
                 </label>
                 <input
@@ -722,13 +722,13 @@ const UserDashboard: React.FC = () => {
                     ...autoBettingConfig,
                     bet_amount: parseFloat(e.target.value) || 1.0
                   })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-md text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   disabled={isAutoBettingActive}
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
                   Meta de Lucro Diário (%)
                 </label>
                 <input
@@ -740,13 +740,13 @@ const UserDashboard: React.FC = () => {
                     ...autoBettingConfig,
                     profit_target: parseInt(e.target.value) || 30
                   })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-md text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   disabled={isAutoBettingActive}
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
                   Stop Loss (%)
                 </label>
                 <input
@@ -758,13 +758,13 @@ const UserDashboard: React.FC = () => {
                     ...autoBettingConfig,
                     stop_loss: parseInt(e.target.value) || 100
                   })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-md text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   disabled={isAutoBettingActive}
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
                   Confiança Mínima (%)
                 </label>
                 <input
@@ -776,7 +776,7 @@ const UserDashboard: React.FC = () => {
                     ...autoBettingConfig,
                     min_confidence: (parseInt(e.target.value) || 60) / 100
                   })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-md text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   disabled={isAutoBettingActive}
                 />
               </div>
@@ -786,12 +786,12 @@ const UserDashboard: React.FC = () => {
                 disabled={isLoading || !isBotActive}
                 className={`w-full py-2 px-4 rounded-md font-medium transition-all duration-200 disabled:opacity-50 flex items-center justify-center ${
                   isAutoBettingActive
-                    ? 'bg-red-500 hover:bg-red-600 text-white'
-                    : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white'
+                    ? 'gradient-error text-white hover:shadow-lg'
+                    : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white hover:shadow-lg'
                 }`}
               >
                 {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-5 h-5 spinner" />
                 ) : (
                   <>
                     {isAutoBettingActive ? (
@@ -812,16 +812,16 @@ const UserDashboard: React.FC = () => {
             
             {/* Estatísticas */}
             <div className="space-y-4">
-              <h4 className="font-medium text-gray-900">Estatísticas do Dia</h4>
+              <h4 className="font-medium text-slate-100">Estatísticas do Dia</h4>
               
               {autoBettingStats ? (
                 <div className="space-y-3">
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span className="text-sm text-gray-600">Status</span>
+                  <div className="flex justify-between items-center p-3 bg-slate-800 rounded-lg">
+                    <span className="text-sm text-slate-300">Status</span>
                     <span className={`text-sm font-medium ${
                       autoBettingStats.status === 'active' ? 'text-green-600' :
                       autoBettingStats.status === 'paused_until_tomorrow' ? 'text-yellow-600' :
-                      'text-gray-600'
+                      'text-slate-400'
                     }`}>
                       {autoBettingStats.status === 'active' ? 'Ativo' :
                        autoBettingStats.status === 'paused_until_tomorrow' ? 'Pausado até amanhã' :
@@ -829,8 +829,8 @@ const UserDashboard: React.FC = () => {
                     </span>
                   </div>
                   
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span className="text-sm text-gray-600">Lucro do Dia</span>
+                  <div className="flex justify-between items-center p-3 bg-slate-800 rounded-lg">
+                    <span className="text-sm text-slate-300">Lucro do Dia</span>
                     <span className={`text-sm font-medium ${
                       autoBettingStats.dailyProfit >= 0 ? 'text-green-600' : 'text-red-600'
                     }`}>
@@ -838,31 +838,31 @@ const UserDashboard: React.FC = () => {
                     </span>
                   </div>
                   
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span className="text-sm text-gray-600">Progresso da Meta</span>
+                  <div className="flex justify-between items-center p-3 bg-slate-800 rounded-lg">
+                    <span className="text-sm text-slate-300">Progresso da Meta</span>
                     <span className="text-sm font-medium text-blue-600">
                       {autoBettingStats.targetProgress}%
                     </span>
                   </div>
                   
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span className="text-sm text-gray-600">Apostas Hoje</span>
-                    <span className="text-sm font-medium text-gray-900">
+                  <div className="flex justify-between items-center p-3 bg-slate-800 rounded-lg">
+                    <span className="text-sm text-slate-300">Apostas Hoje</span>
+                    <span className="text-sm font-medium text-slate-100">
                       {autoBettingStats.totalBets}
                     </span>
                   </div>
                   
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span className="text-sm text-gray-600">Taxa de Vitória</span>
+                  <div className="flex justify-between items-center p-3 bg-slate-800 rounded-lg">
+                    <span className="text-sm text-slate-300">Taxa de Vitória</span>
                     <span className="text-sm font-medium text-purple-600">
                       {autoBettingStats.winRate}%
                     </span>
                   </div>
                   
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span className="text-sm text-gray-600">Perdas Consecutivas</span>
+                  <div className="flex justify-between items-center p-3 bg-slate-800 rounded-lg">
+                    <span className="text-sm text-slate-300">Perdas Consecutivas</span>
                     <span className={`text-sm font-medium ${
-                      autoBettingStats.consecutiveLosses >= 3 ? 'text-red-600' : 'text-gray-600'
+                      autoBettingStats.consecutiveLosses >= 3 ? 'text-red-600' : 'text-slate-300'
                     }`}>
                       {autoBettingStats.consecutiveLosses}
                     </span>
@@ -870,18 +870,18 @@ const UserDashboard: React.FC = () => {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <Activity className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">Nenhuma sessão ativa</p>
+                  <Activity className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+                  <p className="text-slate-400">Nenhuma sessão ativa</p>
                 </div>
               )}
             </div>
           </div>
           
           {!isBotActive && (
-            <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="mt-4 p-4 bg-yellow-500/20 border border-yellow-500/50 rounded-lg">
               <div className="flex items-center">
                 <AlertCircle className="w-5 h-5 text-yellow-500 mr-2" />
-                <p className="text-yellow-700 text-sm">
+                <p className="text-yellow-100 text-sm">
                   Configure e ative o bot principal primeiro para usar apostas automáticas.
                 </p>
               </div>
@@ -891,33 +891,33 @@ const UserDashboard: React.FC = () => {
       </div>
 
       {/* Histórico de Apostas */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">Histórico de Apostas</h3>
+      <div className="card-dark">
+        <div className="p-6 border-b border-slate-700">
+          <h3 className="text-lg font-medium text-slate-100">Histórico de Apostas</h3>
         </div>
         
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-slate-700 table-dark">
+            <thead className="bg-slate-800">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
                   Cor
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
                   Valor
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
                   Lucro
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-300 uppercase tracking-wider">
                   Data
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="divide-y divide-slate-700">
               {bets.map((bet) => (
                 <tr key={bet.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -932,7 +932,7 @@ const UserDashboard: React.FC = () => {
                       <span className="text-sm capitalize">{bet.color}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-100">
                     R$ {bet.amount.toFixed(2)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -940,7 +940,7 @@ const UserDashboard: React.FC = () => {
                       R$ {bet.profit.toFixed(2)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                     {new Date(bet.created_at).toLocaleString('pt-BR')}
                   </td>
                 </tr>
@@ -950,8 +950,8 @@ const UserDashboard: React.FC = () => {
           
           {bets.length === 0 && (
             <div className="text-center py-8">
-              <History className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">Nenhuma aposta encontrada</p>
+              <History className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+              <p className="text-slate-400">Nenhuma aposta encontrada</p>
             </div>
           )}
         </div>
